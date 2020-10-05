@@ -13,11 +13,37 @@ namespace SoccerStats
         {
             string currentDirectory = Directory.GetCurrentDirectory();
             DirectoryInfo directory = new DirectoryInfo(currentDirectory);
-            var files = directory.GetFiles("*.txt");
-            foreach(var file in files)
+            var fileName = Path.Combine(directory.FullName, "SoccerGameResults.csv");
+            var fileContents = ReadSoccerResults(fileName);
+        }
+        public static string ReadFile(string fileName)
+        {
+            using (var reader = new StreamReader(fileName))
             {
-                Console.WriteLine(file.Name);
+                return reader.ReadToEnd();
             }
+        }
+
+        public static List<string[]> ReadSoccerResults(string fileName)
+        {
+            var soccerResults = new List<string[]>();
+            using(var reader = new StreamReader(fileName))
+            {
+                string line = "";
+                reader.ReadLine();
+                while((line = reader.ReadLine()) != null)
+                {
+                    var gameResult = new GameResult();
+                    string[] values = line.Split(',');
+                    DateTime gameDate;
+                    if (DateTime.TryParse(values[0], out gameDate))
+                    {
+                        gameResult.GameDate = gameDate;
+                    }
+                    soccerResults.Add(values);
+                }
+            }
+            return soccerResults;
         }
     }
 }
